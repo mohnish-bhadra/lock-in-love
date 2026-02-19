@@ -1,0 +1,36 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Room documents
+    match /rooms/{roomId} {
+      // Allow read if user is in the room's users array
+      allow read: if request.auth != null && 
+                     request.auth.uid in resource.data.users;
+      
+      // Allow create for any authenticated user
+      allow create: if request.auth != null;
+      
+      // Allow update if user is in the room's users array
+      // and the room doesn't exceed 2 users
+      allow update: if request.auth != null && 
+                       request.auth.uid in resource.data.users &&
+                       request.resource.data.users.size() <= 2;
+      
+      // User documents within rooms
+      match /users/{userId} {
+        // Allow read if the requester is in the parent room's users array
+        allow read: if request.auth != null && 
+                       request.auth.uid in get(/databases/$(database)/documents/rooms/$(roomId)).data.users;
+        
+        // Allow create for any authenticated user
+        allow create: if request.auth != null;
+        
+        // Allow update/delete only for the user's own document
+        allow update, delete: if request.auth != null && 
+                                  request.auth.uid == userId;
+      }
+    }
+  }
+}
