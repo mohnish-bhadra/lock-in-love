@@ -6,7 +6,7 @@ A real-time study accountability app where two users can join a shared room, run
 
 ## Features
 
-✨ **Real-time Synchronization**
+ **Real-time Synchronization**
 - Live timer updates between both users
 - Instant heart evolution based on combined study time
 - Real-time room state management
